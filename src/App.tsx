@@ -213,9 +213,9 @@ function App() {
         </div> */}
 
         <div className="mt-2 flex-2 grid grid-cols-[1fr_auto_1fr] items-center gap-[10px]">
-          <div className="relative flex h-[200px] w-full flex-col-reverse items-center justify-between">
+          <div className="relative flex h-[200px] w-full flex-col-reverse  justify-between">
             <span
-              className="absolute bottom-0 left-1/2 -translate-x-1/2  bg-white"
+              className="absolute bottom-0 -left-[2px]  bg-white"
               style={{
                 width: `${COLUMN_FILL_WIDTH}px`,
                 height: "7px",
@@ -265,9 +265,9 @@ function App() {
             </div>
           </div>
 
-          <div className="relative flex h-[200px] w-full flex-col-reverse items-center justify-between">
+          <div className="relative flex h-[200px] w-full flex-col-reverse items-end justify-between">
             <span
-              className="absolute bottom-0 left-1/2 -translate-x-1/2  bg-white"
+              className="absolute bottom-0 -right-[2px]  bg-white"
               style={{
                 width: `${COLUMN_FILL_WIDTH}px`,
                 height: "7px",
