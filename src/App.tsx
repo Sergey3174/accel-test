@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import STAR from "./assets/star.png";
 
 type MotionState = {
   beta: number;
@@ -73,13 +74,10 @@ function App() {
         return;
       }
 
-      const beta = event.beta;
-      const gamma = event.gamma;
-
       setMotion((current) => ({
         ...current,
-        beta: clamp(beta, -90, 90),
-        gamma: clamp(gamma, -90, 90),
+        beta: clamp(event.beta ?? 0, -90, 90),
+        gamma: clamp(event.gamma ?? 0, -90, 90),
         alpha: event.alpha ?? 0,
         permission: "granted",
         usingPointer: false,
@@ -87,7 +85,8 @@ function App() {
     };
 
     window.addEventListener("deviceorientation", onOrientation, true);
-    return () => window.removeEventListener("deviceorientation", onOrientation, true);
+    return () =>
+      window.removeEventListener("deviceorientation", onOrientation, true);
   }, []);
 
   useEffect(() => {
@@ -115,33 +114,6 @@ function App() {
     window.addEventListener("pointermove", onPointerMove);
     return () => window.removeEventListener("pointermove", onPointerMove);
   }, []);
-
-  const requestPermission = async () => {
-    type IOSPermission = {
-      requestPermission?: () => Promise<"granted" | "denied">;
-    };
-
-    const Orientation = window.DeviceOrientationEvent as typeof DeviceOrientationEvent &
-      IOSPermission;
-
-    if (typeof Orientation?.requestPermission !== "function") {
-      setMotion((current) => ({
-        ...current,
-        permission: current.supported ? "granted" : "denied",
-      }));
-      return;
-    }
-
-    try {
-      const result = await Orientation.requestPermission();
-      setMotion((current) => ({
-        ...current,
-        permission: result === "granted" ? "granted" : "denied",
-      }));
-    } catch {
-      setMotion((current) => ({ ...current, permission: "denied" }));
-    }
-  };
 
   const step = steps[stepIndex];
   const verticalOffset = Math.abs(Math.abs(motion.beta) - VERTICAL_BETA);
@@ -173,119 +145,146 @@ function App() {
 
   const tiltY = clamp(motion.gamma / 55, -1, 1);
   const tiltX = clamp((Math.abs(motion.beta) - VERTICAL_BETA) / 28, -1, 1);
-  const phoneTransform = `perspective(1200px) rotateX(${tiltX * -8}deg) rotateY(${tiltY * 15}deg) rotateZ(${tiltY * 18}deg)`;
-  const cardTransform = `translateX(${tiltY * 7}px) translateY(${tiltX * 4}px) rotate(${tiltY * 22}deg)`;
+  const miniPhoneTransform = `perspective(1200px) rotateX(${tiltX * -8}deg) rotateY(${tiltY * 15}deg) rotateZ(${tiltY * 18}deg) translateX(${tiltY * 7}px) translateY(${tiltX * 4}px)`;
   const seconds = Math.ceil(holdMs / 1000)
     .toString()
     .padStart(2, "0");
   const progressAngle = `${(1 - holdMs / HOLD_DURATION_MS) * 360}deg`;
   const progressSegment = stepIndex + 3;
-  const bars = Array.from({ length: 11 }, (_, index) => alignment >= index / 10);
-  const statusText = verticalReady
-    ? `ALIGN ${Math.round(alignment * 100)}% | GAMMA ${motion.gamma.toFixed(1)} DEG`
-    : "TELEFONU ONCE DIK KONUMA GETIRIN";
+  const bars = Array.from(
+    { length: 20 },
+    (_, index) => alignment >= index / 10,
+  );
 
   return (
-    <main className="app-shell">
-      <section className="screen-wrap">
-        <div className="device-shadow" />
-
-        <article className="app-screen">
-          <header className="screen-header">
-            <div className="step-title">{step.title}</div>
-            <div className="step-subtitle">{step.subtitle}</div>
-            <div className="progress-strip">
-              {["#3b82f6", "#ef4444", "#f59e0b", "#84cc16", "#9ca3af"].map((color, index) => (
+    <main className="relative min-h-screen w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
+      <section className="relative z-10 flex min-h-screen w-full flex-col px-[10px] pb-[max(18px,env(safe-area-inset-bottom))] pt-[max(18px,env(safe-area-inset-top))] sm:px-4">
+        <header className="text-center">
+          <div className="text-[14px]  font-medium uppercase leading-[1.25] tracking-[-0.02em]">
+            {step.title}
+          </div>
+          <div className="mt-2 text-[14px]  uppercase tracking-[-0.03em] ">
+            {step.subtitle}
+          </div>
+          <div className="mx-auto mt-3 flex w-[96%] gap-[3px]">
+            {["#3b82f6", "#ef4444", "#f59e0b", "#84cc16", "#9ca3af"].map(
+              (color, index) => (
                 <span
                   key={color}
-                  className="progress-segment"
-                  style={{ background: color, opacity: index <= progressSegment ? 1 : 0.4 }}
+                  className={`h-[6px] flex-1 ${
+                    index === 0
+                      ? "rounded-l-full"
+                      : index === 4
+                        ? "rounded-r-full"
+                        : ""
+                  }`}
+                  style={{
+                    background: color,
+                    opacity: index <= progressSegment ? 1 : 0.4,
+                  }}
                 />
-              ))}
-            </div>
-          </header>
+              ),
+            )}
+          </div>
+        </header>
 
-          <div className={`calibration-arrow ${step.direction === "left" ? "left" : "right"}`}>
-            <span className="calibration-arrow-shaft" />
-            <span className="calibration-arrow-head" />
+        {/* <div className="relative mx-auto mt-[18px] h-[62px] w-[118px]">
+          <span className="absolute left-[8px] top-[24px] h-[14px] w-[84px] rounded-full bg-[#2f93ff]" />
+          <span
+            className={`absolute top-[10px] h-0 w-0 border-y-[21px] border-y-transparent ${
+              step.direction === "left"
+                ? "left-[5px] rotate-180 border-l-[31px] border-l-[#2f93ff]"
+                : "right-[5px] border-l-[31px] border-l-[#2f93ff]"
+            }`}
+          />
+        </div> */}
+
+        <div className="mt-2 flex-2 grid grid-cols-[1fr_auto_1fr] items-center gap-[10px]">
+          <div className="flex h-[200px] flex-col-reverse items-center justify-between">
+            {bars.map((active, index) => (
+              <span
+                key={`left-${index}`}
+                className={`block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
+              />
+            ))}
           </div>
 
-          <div className="meter-layout">
-            <div className="meter-column">
-              {bars.map((active, index) => (
-                <span
-                  key={`left-${index}`}
-                  className={`meter-bar ${active ? "active" : ""}`}
-                />
-              ))}
-            </div>
+          <div className="relative flex h-[214px] w-[150px] items-center justify-center">
+            <div className="absolute inset-[28px_16px_16px] rounded-[32px] bg-black/12 blur-[12px]" />
+            <div className="absolute left-[6px] top-[32px] h-[126px] w-[52px] rotate-[-15deg] rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0)),linear-gradient(180deg,rgba(176,132,62,0.56),rgba(123,123,123,0.3))] opacity-70" />
+            <div className="absolute right-[6px] top-[32px] h-[126px] w-[52px] rotate-[15deg] rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0)),linear-gradient(180deg,rgba(176,132,62,0.56),rgba(123,123,123,0.3))] opacity-70" />
 
-            <div className="phone-stage">
-              <div className="phone-fan fan-left" />
-              <div className="phone-fan fan-right" />
-              <div className="handset-shadow" />
+            <div
+              className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl border-[3px] border-[#272727] bg-[linear-gradient(180deg,#fcfcfd_0%,#d8dde7_100%)] shadow-[0_14px_24px_rgba(0,0,0,0.28)] transition-transform duration-200"
+              style={{ transform: miniPhoneTransform }}
+            >
+              <div className="h-[12px] w-[48px] rounded-b-md bg-[#171717]" />
 
-              <div className="mini-phone" style={{ transform: `${phoneTransform} ${cardTransform}` }}>
-                <div className="mini-notch" />
-                <div className="mini-brand">SAMSUNG</div>
-                <div className="google-logo" aria-hidden="true">
-                  <span className="g-blue">G</span>
-                  <span className="g-red">o</span>
-                  <span className="g-yellow">o</span>
-                  <span className="g-blue">g</span>
-                  <span className="g-green">l</span>
-                  <span className="g-red">e</span>
-                </div>
+              <div className="mt-7 flex items-baseline text-[26px] font-black tracking-[-0.08em]">
+                <span className="text-[#4285f4]">G</span>
+                <span className="text-[#ea4335]">o</span>
+                <span className="text-[#fbbc05]">o</span>
+                <span className="text-[#4285f4]">g</span>
+                <span className="text-[#34a853]">l</span>
+                <span className="text-[#ea4335]">e</span>
+              </div>
+              <div className="mt-auto mb-5 text-[12px] font-bold  text-[#4764a2]">
+                SAMSUNG
               </div>
             </div>
-
-            <div className="meter-column">
-              {[...bars].reverse().map((active, index) => (
-                <span
-                  key={`right-${index}`}
-                  className={`meter-bar ${active ? "active" : ""}`}
-                />
-              ))}
-            </div>
           </div>
 
-          <p className="instruction-copy">{step.body}</p>
+          <div className="flex h-[200px] flex-col-reverse items-center justify-between">
+            {[...bars].reverse().map((active, index) => (
+              <span
+                key={`right-${index}`}
+                className={`block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="mt-[18px] flex flex-col items-center flex-1">
+          <p className="mx-auto mt-2 max-w-[70%] text-center flex items-center text-md  uppercase leading-[1.28] tracking-[-0.01em] text-white/95">
+            {step.body}
+          </p>
 
-          <div className="timer-row">
-            <div className="seconds-readout">
+          <div className="mt-[18px] flex items-center justify-center gap-3">
+            <div className="text-[48px] leading-none font-black tracking-[-0.08em]">
               {seconds}
-              <span>s</span>
+              <span className="text-[28px]">s</span>
             </div>
-            <div className="spinner-ring" style={{ ["--fill" as string]: progressAngle }} />
+            <div
+              className="h-[42px] w-[42px] rounded-full [mask:radial-gradient(circle,transparent_54%,black_56%)]"
+              style={{
+                background: `conic-gradient(#e5e7eb 0deg, #e5e7eb ${progressAngle}, rgba(255,255,255,0.16) ${progressAngle}, rgba(255,255,255,0.16) 360deg)`,
+              }}
+            />
           </div>
+        </div>
 
-          <footer className="screen-footer">
+        <hr className="border-white/24" />
+
+        <footer className="mt-auto  flex items-center justify-between pt-[18px] text-white/92">
+          <div>
+            <div className="brand-google-font text-[17px] leading-none font-medium">
+              Google
+            </div>
+            <div className=" text-[12px] text-white/72">
+              Certified Calibration
+            </div>
+          </div>
+          <div className="text-right flex items-center">
             <div>
-              <div className="footer-brand">Google</div>
-              <div className="footer-copy">Certified Calibration</div>
+              <div className="brand-google-font text-[17px] leading-none font-medium">
+                Vector
+              </div>
+              <div className=" text-[12px] text-white/72">Based</div>
             </div>
-            <div className="footer-right">
-              <div className="footer-brand">Vector +</div>
-              <div className="footer-copy">Based</div>
+            <div>
+              <img src={STAR} className="h-[50px] w-[50px]" />
             </div>
-          </footer>
-
-          <div className="controls">
-            <button type="button" onClick={requestPermission} className="sensor-button">
-              Enable sensors
-            </button>
-
-            <p className="sensor-copy">
-              {motion.permission === "granted"
-                ? "Motion sensors are active."
-                : motion.usingPointer
-                  ? "Desktop preview is active. Move the mouse left and right."
-                  : "Allow motion access on the phone to use the accelerometer."}
-            </p>
-
-            <div className={`status-pill ${verticalReady ? "ready" : ""}`}>{statusText}</div>
           </div>
-        </article>
+        </footer>
       </section>
     </main>
   );
