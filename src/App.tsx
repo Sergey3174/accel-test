@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import STAR from "./assets/star.png";
+import PHONE from "./assets/phone.png";
+import GOOGLE_LOGO from "./assets/google.png";
+import SAMSUNG from "./assets/samsung.png";
 
 type MotionState = {
   beta: number;
@@ -40,6 +43,8 @@ const steps: CalibrationStep[] = [
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
+
+const loaderSticks = Array.from({ length: 12 }, (_, index) => index + 1);
 
 function App() {
   const [motion, setMotion] = useState<MotionState>({
@@ -149,7 +154,6 @@ function App() {
   const seconds = Math.ceil(holdMs / 1000)
     .toString()
     .padStart(2, "0");
-  const progressAngle = `${(1 - holdMs / HOLD_DURATION_MS) * 360}deg`;
   const progressSegment = stepIndex + 3;
   const bars = Array.from(
     { length: 20 },
@@ -210,32 +214,42 @@ function App() {
           </div>
 
           <div className="relative flex h-[214px] w-[150px] items-center justify-center">
-            <div className="absolute inset-[28px_16px_16px] rounded-[32px] bg-black/12 blur-[12px]" />
-            <div className="absolute left-[6px] top-[32px] h-[126px] w-[52px] rotate-[-15deg] rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0)),linear-gradient(180deg,rgba(176,132,62,0.56),rgba(123,123,123,0.3))] opacity-70" />
-            <div className="absolute right-[6px] top-[32px] h-[126px] w-[52px] rotate-[15deg] rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0)),linear-gradient(180deg,rgba(176,132,62,0.56),rgba(123,123,123,0.3))] opacity-70" />
+            <div className="absolute -left-[30px] -top-0 rotate-[-20deg] rounded-[24px] opacity-70s">
+              <div
+                className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50  transition-transform duration-200"
+                style={{
+                  background: `center / 100% 100% no-repeat url(${PHONE})`,
+                }}
+              ></div>
+            </div>
+
+            <div className="absolute -right-[30px] -top-0 rotate-[20deg] rounded-[24px] opacity-70s">
+              <div
+                className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50  transition-transform duration-200"
+                style={{
+                  background: `center / 100% 100% no-repeat url(${PHONE})`,
+                }}
+              ></div>
+            </div>
 
             <div
-              className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl border-[3px] border-[#272727] bg-[linear-gradient(180deg,#fcfcfd_0%,#d8dde7_100%)] shadow-[0_14px_24px_rgba(0,0,0,0.28)] transition-transform duration-200"
-              style={{ transform: miniPhoneTransform }}
+              className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl  transition-transform duration-200"
+              style={{
+                transform: miniPhoneTransform,
+                background: `center / 100% 100% no-repeat url(${PHONE})`,
+              }}
             >
-              <div className="h-[12px] w-[48px] rounded-b-md bg-[#171717]" />
-
-              <div className="mt-7 flex items-baseline text-[26px] font-black tracking-[-0.08em]">
-                <span className="text-[#4285f4]">G</span>
-                <span className="text-[#ea4335]">o</span>
-                <span className="text-[#fbbc05]">o</span>
-                <span className="text-[#4285f4]">g</span>
-                <span className="text-[#34a853]">l</span>
-                <span className="text-[#ea4335]">e</span>
+              <div className="flex-1 flex h-15 w-15 justify-center items-center">
+                <img src={GOOGLE_LOGO} alt="Google Logo" />
               </div>
-              <div className="mt-auto mb-5 text-[12px] font-bold  text-[#4764a2]">
-                SAMSUNG
+              <div className="flex h-15 w-15 justify-center items-center">
+                <img src={SAMSUNG} alt="Samsung Logo" />
               </div>
             </div>
           </div>
 
           <div className="flex h-[200px] flex-col-reverse items-center justify-between">
-            {[...bars].reverse().map((active, index) => (
+            {[...bars].map((active, index) => (
               <span
                 key={`right-${index}`}
                 className={`block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
@@ -249,16 +263,19 @@ function App() {
           </p>
 
           <div className="mt-[18px] flex items-center justify-center gap-3">
-            <div className="text-[48px] leading-none font-black tracking-[-0.08em]">
-              {seconds}
-              <span className="text-[28px]">s</span>
+            <div className="loader relative">
+              {loaderSticks.map((stick) => (
+                <div
+                  key={stick}
+                  className="loader__stick"
+                  style={{ ["--i" as string]: stick }}
+                />
+              ))}
+              <div className="absolute -left-20 top-1/2 -translate-y-1/2 text-[48px] leading-none font-black tracking-[-0.08em]">
+                {seconds}
+                <span className="text-[28px]">s</span>
+              </div>
             </div>
-            <div
-              className="h-[42px] w-[42px] rounded-full [mask:radial-gradient(circle,transparent_54%,black_56%)]"
-              style={{
-                background: `conic-gradient(#e5e7eb 0deg, #e5e7eb ${progressAngle}, rgba(255,255,255,0.16) ${progressAngle}, rgba(255,255,255,0.16) 360deg)`,
-              }}
-            />
           </div>
         </div>
 
