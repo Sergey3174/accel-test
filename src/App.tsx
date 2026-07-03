@@ -23,6 +23,12 @@ type CalibrationStep = {
 
 const HOLD_DURATION_MS = 2400;
 const VERTICAL_BETA = 78;
+const BAR_WIDTH = 16;
+const BAR_HEIGHT = 7;
+const BAR_COUNT = 20;
+const COLUMN_HEIGHT = 200;
+const COLUMN_FILL_WIDTH = BAR_WIDTH + 4;
+const BAR_GAP = (COLUMN_HEIGHT - BAR_COUNT * BAR_HEIGHT) / (BAR_COUNT - 1);
 
 const steps: CalibrationStep[] = [
   {
@@ -156,9 +162,12 @@ function App() {
     .padStart(2, "0");
   const progressSegment = stepIndex + 3;
   const bars = Array.from(
-    { length: 20 },
+    { length: BAR_COUNT },
     (_, index) => alignment >= index / 10,
   );
+  const activeBars = bars.filter(Boolean).length;
+  const fillHeight =
+    activeBars === 0 ? 0 : activeBars * BAR_HEIGHT + (activeBars - 1) * BAR_GAP;
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
@@ -170,12 +179,12 @@ function App() {
           <div className="mt-2 text-[14px]  uppercase tracking-[-0.03em] ">
             {step.subtitle}
           </div>
-          <div className="mx-auto mt-3 flex w-[96%] gap-[3px]">
+          <div className="mx-auto mt-4 flex w-[96%] gap-[3px]">
             {["#3b82f6", "#ef4444", "#f59e0b", "#84cc16", "#9ca3af"].map(
               (color, index) => (
                 <span
                   key={color}
-                  className={`h-[6px] flex-1 ${
+                  className={`h-[8px] flex-1 ${
                     index === 0
                       ? "rounded-l-full"
                       : index === 4
@@ -204,11 +213,19 @@ function App() {
         </div> */}
 
         <div className="mt-2 flex-2 grid grid-cols-[1fr_auto_1fr] items-center gap-[10px]">
-          <div className="flex h-[200px] flex-col-reverse items-center justify-between">
+          <div className="relative flex h-[200px] w-full flex-col-reverse items-center justify-between">
+            <span
+              className="absolute bottom-0 left-1/2 -translate-x-1/2  bg-white"
+              style={{
+                width: `${COLUMN_FILL_WIDTH}px`,
+                height: "7px",
+                bottom: `${fillHeight}px`,
+              }}
+            />
             {bars.map((active, index) => (
               <span
                 key={`left-${index}`}
-                className={`block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
+                className={`relative z-10 block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
               />
             ))}
           </div>
@@ -248,11 +265,19 @@ function App() {
             </div>
           </div>
 
-          <div className="flex h-[200px] flex-col-reverse items-center justify-between">
+          <div className="relative flex h-[200px] w-full flex-col-reverse items-center justify-between">
+            <span
+              className="absolute bottom-0 left-1/2 -translate-x-1/2  bg-white"
+              style={{
+                width: `${COLUMN_FILL_WIDTH}px`,
+                height: "7px",
+                bottom: `${fillHeight}px`,
+              }}
+            />
             {[...bars].map((active, index) => (
               <span
                 key={`right-${index}`}
-                className={`block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
+                className={`relative z-10 block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
               />
             ))}
           </div>
@@ -271,7 +296,7 @@ function App() {
                   style={{ ["--i" as string]: stick }}
                 />
               ))}
-              <div className="absolute -left-20 top-1/2 -translate-y-1/2 text-[48px] leading-none font-black tracking-[-0.08em]">
+              <div className="absolute -left-20 top-1/2 -translate-y-1/2 text-[48px] leading-none font-bold tracking-[-0.08em]">
                 {seconds}
                 <span className="text-[28px]">s</span>
               </div>
