@@ -3,6 +3,7 @@ import STAR from "./assets/star.png";
 import PHONE from "./assets/phone.png";
 import GOOGLE_LOGO from "./assets/google.png";
 import SAMSUNG from "./assets/samsung.png";
+import ARROW from "./assets/arrow.png";
 
 type MotionState = {
   beta: number;
@@ -154,9 +155,6 @@ function App() {
     return () => window.clearInterval(interval);
   }, [isAligned]);
 
-  const tiltY = clamp(motion.gamma / 55, -1, 1);
-  const tiltX = clamp((Math.abs(motion.beta) - VERTICAL_BETA) / 28, -1, 1);
-  const miniPhoneTransform = `perspective(1200px) rotateX(${tiltX * -8}deg) rotateY(${tiltY * 15}deg) rotateZ(${tiltY * 18}deg) translateX(${tiltY * 7}px) translateY(${tiltX * 4}px)`;
   const seconds = Math.ceil(holdMs / 1000)
     .toString()
     .padStart(2, "0");
@@ -231,7 +229,16 @@ function App() {
           </div>
 
           <div className="relative flex h-[214px] w-[150px] items-center justify-center">
-            <div className="absolute -left-[30px] -top-0 rotate-[-20deg] rounded-[24px] opacity-70s">
+            <div className="absolute -right-[120px] -top-[120px] rounded-[24px] z-99 phone-arrow-turn">
+              <div
+                className="relative z-10 flex h-[125px] w-[250px] transition-transform duration-200"
+                style={{
+                  background: `center / 100% 100% no-repeat url(${ARROW})`,
+                }}
+              ></div>
+            </div>
+
+            <div className="absolute -left-[30px] -top-0 rounded-[24px] phone-stack-left">
               <div
                 className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50  transition-transform duration-200"
                 style={{
@@ -240,7 +247,7 @@ function App() {
               ></div>
             </div>
 
-            <div className="absolute -right-[30px] -top-0 rotate-[20deg] rounded-[24px] opacity-70s">
+            <div className="absolute -right-[30px] -top-0 rounded-[24px] phone-stack-right">
               <div
                 className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50  transition-transform duration-200"
                 style={{
@@ -250,9 +257,8 @@ function App() {
             </div>
 
             <div
-              className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl  transition-transform duration-200"
+              className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl transition-transform duration-200 phone-main-turn"
               style={{
-                transform: miniPhoneTransform,
                 background: `center / 100% 100% no-repeat url(${PHONE})`,
               }}
             >
