@@ -26,7 +26,6 @@ const HOLD_DURATION_MS = 2400;
 const VERTICAL_BETA = 78;
 const UPSIDE_DOWN_BETA = -78;
 const UPSIDE_DOWN_TOLERANCE = 22;
-const UPSIDE_DOWN_START_BETA = -20;
 const BAR_WIDTH = 16;
 const BAR_HEIGHT = 7;
 const BAR_COUNT = 20;
@@ -138,8 +137,7 @@ function App() {
   const turnDirectionGamma =
     step.direction === "right" ? motion.gamma : -motion.gamma;
   const upsideDownProgress = clamp(
-    (UPSIDE_DOWN_START_BETA - motion.beta) /
-      (UPSIDE_DOWN_START_BETA - UPSIDE_DOWN_BETA),
+    (VERTICAL_BETA - motion.beta) / (VERTICAL_BETA - UPSIDE_DOWN_BETA),
     0,
     1,
   );
