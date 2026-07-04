@@ -26,6 +26,7 @@ const HOLD_DURATION_MS = 2400;
 const VERTICAL_BETA = 78;
 const UPSIDE_DOWN_BETA = -78;
 const UPSIDE_DOWN_TOLERANCE = 22;
+const UPSIDE_DOWN_START_BETA = -20;
 const BAR_WIDTH = 16;
 const BAR_HEIGHT = 7;
 const BAR_COUNT = 20;
@@ -136,14 +137,19 @@ function App() {
   const upsideDownReady = upsideDownOffset < UPSIDE_DOWN_TOLERANCE;
   const turnDirectionGamma =
     step.direction === "right" ? motion.gamma : -motion.gamma;
-  const alignment = upsideDownReady
-    ? clamp(
-        (turnDirectionGamma - TURN_START_GAMMA) /
-          (TURN_FULL_GAMMA - TURN_START_GAMMA),
-        0,
-        1,
-      )
-    : 0;
+  const upsideDownProgress = clamp(
+    (UPSIDE_DOWN_START_BETA - motion.beta) /
+      (UPSIDE_DOWN_START_BETA - UPSIDE_DOWN_BETA),
+    0,
+    1,
+  );
+  const turnProgress = clamp(
+    (turnDirectionGamma - TURN_START_GAMMA) /
+      (TURN_FULL_GAMMA - TURN_START_GAMMA),
+    0,
+    1,
+  );
+  const alignment = upsideDownProgress * turnProgress;
   const isAligned = upsideDownReady && turnDirectionGamma >= TURN_FULL_GAMMA;
 
   useEffect(() => {
