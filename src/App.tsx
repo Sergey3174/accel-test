@@ -229,7 +229,7 @@ function App() {
           </div>
 
           <div className="relative flex h-[214px] w-[150px] items-center justify-center">
-            <div className="absolute -right-[120px] -top-[120px] rounded-[24px] z-99 phone-arrow-turn">
+            <div className="absolute -right-[120px] -top-[80px] rounded-[24px] z-99 phone-arrow-turn">
               <div
                 className="relative z-10 flex h-[125px] w-[250px] transition-transform duration-200"
                 style={{
