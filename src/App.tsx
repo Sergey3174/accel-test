@@ -24,12 +24,16 @@ type CalibrationStep = {
 
 const HOLD_DURATION_MS = 2400;
 const VERTICAL_BETA = 78;
+const UPSIDE_DOWN_BETA = -78;
+const UPSIDE_DOWN_TOLERANCE = 18;
 const BAR_WIDTH = 16;
 const BAR_HEIGHT = 7;
 const BAR_COUNT = 20;
 const COLUMN_HEIGHT = 200;
 const COLUMN_FILL_WIDTH = BAR_WIDTH + 4;
 const BAR_GAP = (COLUMN_HEIGHT - BAR_COUNT * BAR_HEIGHT) / (BAR_COUNT - 1);
+const TURN_START_GAMMA = 8;
+const TURN_FULL_GAMMA = 42;
 
 const steps: CalibrationStep[] = [
   {
@@ -128,12 +132,19 @@ function App() {
   }, []);
 
   const step = steps[stepIndex];
-  const verticalOffset = Math.abs(Math.abs(motion.beta) - VERTICAL_BETA);
-  const verticalReady = verticalOffset < 18;
-  const gammaDelta = Math.abs(motion.gamma - step.targetGamma);
-  const distance = gammaDelta + verticalOffset * 1.35;
-  const alignment = verticalReady ? clamp(1 - distance / 42, 0, 1) : 0;
-  const isAligned = verticalReady && gammaDelta < 9;
+  const upsideDownOffset = Math.abs(motion.beta - UPSIDE_DOWN_BETA);
+  const upsideDownReady = upsideDownOffset < UPSIDE_DOWN_TOLERANCE;
+  const turnDirectionGamma =
+    step.direction === "right" ? motion.gamma : -motion.gamma;
+  const alignment = upsideDownReady
+    ? clamp(
+        (turnDirectionGamma - TURN_START_GAMMA) /
+          (TURN_FULL_GAMMA - TURN_START_GAMMA),
+        0,
+        1,
+      )
+    : 0;
+  const isAligned = upsideDownReady && turnDirectionGamma >= TURN_FULL_GAMMA;
 
   useEffect(() => {
     if (!isAligned) {
