@@ -32,8 +32,7 @@ const BAR_COUNT = 20;
 const COLUMN_HEIGHT = 200;
 const COLUMN_FILL_WIDTH = BAR_WIDTH + 4;
 const BAR_GAP = (COLUMN_HEIGHT - BAR_COUNT * BAR_HEIGHT) / (BAR_COUNT - 1);
-const TURN_START_GAMMA = 8;
-const TURN_FULL_GAMMA = 42;
+const SUCCESS_PROGRESS = 0.96;
 
 const steps: CalibrationStep[] = [
   {
@@ -119,7 +118,7 @@ function App() {
 
         return {
           ...current,
-          beta: clamp(VERTICAL_BETA + relativeY * 10, 55, 90),
+          beta: clamp(relativeY * -90, -90, 90),
           gamma: clamp(relativeX * 46, -46, 46),
           alpha: 0,
           usingPointer: true,
@@ -132,28 +131,15 @@ function App() {
   }, []);
 
   const step = steps[stepIndex];
-  const upsideDownOffset = Math.abs(motion.beta - UPSIDE_DOWN_BETA);
-  const upsideDownReady = upsideDownOffset < UPSIDE_DOWN_TOLERANCE;
-  const turnDirectionGamma =
-    step.direction === "right" ? motion.gamma : -motion.gamma;
-  const upsideDownProgress = clamp(
+  const flipProgress = clamp(
     (VERTICAL_BETA - motion.beta) / (VERTICAL_BETA - UPSIDE_DOWN_BETA),
     0,
     1,
   );
-  const turnProgress = clamp(
-    (Math.abs(turnDirectionGamma) - TURN_START_GAMMA) /
-      (TURN_FULL_GAMMA - TURN_START_GAMMA),
-    0,
-    1,
-  );
-  const alignment = Math.max(
-    upsideDownProgress,
-    upsideDownProgress * turnProgress,
-  );
-  const isAligned =
-    upsideDownReady &&
-    (upsideDownProgress >= 0.98 || Math.abs(turnDirectionGamma) >= TURN_FULL_GAMMA);
+  const upsideDownOffset = Math.abs(motion.beta - UPSIDE_DOWN_BETA);
+  const upsideDownReady = upsideDownOffset < UPSIDE_DOWN_TOLERANCE;
+  const alignment = flipProgress;
+  const isAligned = upsideDownReady || flipProgress >= SUCCESS_PROGRESS;
 
   useEffect(() => {
     if (!isAligned) {
