@@ -142,13 +142,18 @@ function App() {
     1,
   );
   const turnProgress = clamp(
-    (turnDirectionGamma - TURN_START_GAMMA) /
+    (Math.abs(turnDirectionGamma) - TURN_START_GAMMA) /
       (TURN_FULL_GAMMA - TURN_START_GAMMA),
     0,
     1,
   );
-  const alignment = upsideDownProgress * turnProgress;
-  const isAligned = upsideDownReady && turnDirectionGamma >= TURN_FULL_GAMMA;
+  const alignment = Math.max(
+    upsideDownProgress,
+    upsideDownProgress * turnProgress,
+  );
+  const isAligned =
+    upsideDownReady &&
+    (upsideDownProgress >= 0.98 || Math.abs(turnDirectionGamma) >= TURN_FULL_GAMMA);
 
   useEffect(() => {
     if (!isAligned) {
