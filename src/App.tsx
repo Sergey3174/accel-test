@@ -25,7 +25,7 @@ type CalibrationStep = {
 const HOLD_DURATION_MS = 2400;
 const VERTICAL_BETA = 78;
 const UPSIDE_DOWN_BETA = -78;
-const UPSIDE_DOWN_TOLERANCE = 18;
+const UPSIDE_DOWN_TOLERANCE = 22;
 const BAR_WIDTH = 16;
 const BAR_HEIGHT = 7;
 const BAR_COUNT = 20;
@@ -170,10 +170,10 @@ function App() {
     .toString()
     .padStart(2, "0");
   const progressSegment = stepIndex + 3;
-  const bars = Array.from(
-    { length: BAR_COUNT },
-    (_, index) => alignment >= index / 10,
-  );
+  const bars = Array.from({ length: BAR_COUNT }, (_, index) => {
+    const threshold = (index + 1) / BAR_COUNT;
+    return alignment >= threshold;
+  });
   const activeBars = bars.filter(Boolean).length;
   const fillHeight =
     activeBars === 0 ? 0 : activeBars * BAR_HEIGHT + (activeBars - 1) * BAR_GAP;
