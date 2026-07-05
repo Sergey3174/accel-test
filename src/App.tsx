@@ -4,6 +4,7 @@ import PHONE from "./assets/phone.png";
 import GOOGLE_LOGO from "./assets/google.png";
 import SAMSUNG from "./assets/samsung.png";
 import ARROW from "./assets/arrow.png";
+import Success from "./animation/Success";
 
 type MotionState = {
   beta: number;
@@ -172,7 +173,6 @@ function App() {
   const activeBars = bars.filter(Boolean).length;
   const fillHeight =
     activeBars === 0 ? 0 : activeBars * BAR_HEIGHT + (activeBars - 1) * BAR_GAP;
-  const isSuccess = activeBars === BAR_COUNT;
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
@@ -236,54 +236,53 @@ function App() {
           </div>
 
           <div className="relative flex h-[214px] w-[150px] items-center justify-center">
-            {isSuccess ? (
-              <div className="text-center text-[34px] font-bold uppercase tracking-[-0.06em] text-white">
-                Success
+            <div className="absolute -right-[120px] -top-[80px] rounded-[24px] z-99 phone-arrow-turn">
+              <div
+                className="relative z-10 flex h-[125px] w-[250px] transition-transform duration-200"
+                style={{
+                  background: `center / 100% 100% no-repeat url(${ARROW})`,
+                }}
+              ></div>
+            </div>
+
+            <div className="absolute -left-[30px] -top-0 rounded-[24px] phone-stack-left">
+              <div
+                className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
+                style={{
+                  background: `center / 100% 100% no-repeat url(${PHONE})`,
+                }}
+              ></div>
+            </div>
+
+            <div className="absolute -right-[30px] -top-0 rounded-[24px] phone-stack-right">
+              <div
+                className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
+                style={{
+                  background: `center / 100% 100% no-repeat url(${PHONE})`,
+                }}
+              ></div>
+            </div>
+
+            <div
+              className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl transition-transform duration-200 phone-main-turn"
+              style={{
+                background: `center / 100% 100% no-repeat url(${PHONE})`,
+              }}
+            >
+              <div className="phone-main-logos flex h-full w-full flex-col items-center">
+                <div className="flex-1 flex h-15 w-15 justify-center items-center">
+                  <img src={GOOGLE_LOGO} alt="Google Logo" />
+                </div>
+                <div className="flex h-15 w-15 justify-center items-center">
+                  <img src={SAMSUNG} alt="Samsung Logo" />
+                </div>
               </div>
-            ) : (
-              <>
-                <div className="absolute -right-[120px] -top-[80px] rounded-[24px] z-99 phone-arrow-turn">
-                  <div
-                    className="relative z-10 flex h-[125px] w-[250px] transition-transform duration-200"
-                    style={{
-                      background: `center / 100% 100% no-repeat url(${ARROW})`,
-                    }}
-                  ></div>
+              <div className="phone-main-success absolute inset-0 flex items-center justify-center px-[10px] py-[18px]">
+                <div className="flex h-full w-full items-center justify-center">
+                  <Success />
                 </div>
-
-                <div className="absolute -left-[30px] -top-0 rounded-[24px] phone-stack-left">
-                  <div
-                    className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50  transition-transform duration-200"
-                    style={{
-                      background: `center / 100% 100% no-repeat url(${PHONE})`,
-                    }}
-                  ></div>
-                </div>
-
-                <div className="absolute -right-[30px] -top-0 rounded-[24px] phone-stack-right">
-                  <div
-                    className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50  transition-transform duration-200"
-                    style={{
-                      background: `center / 100% 100% no-repeat url(${PHONE})`,
-                    }}
-                  ></div>
-                </div>
-
-                <div
-                  className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl transition-transform duration-200 phone-main-turn"
-                  style={{
-                    background: `center / 100% 100% no-repeat url(${PHONE})`,
-                  }}
-                >
-                  <div className="flex-1 flex h-15 w-15 justify-center items-center">
-                    <img src={GOOGLE_LOGO} alt="Google Logo" />
-                  </div>
-                  <div className="flex h-15 w-15 justify-center items-center">
-                    <img src={SAMSUNG} alt="Samsung Logo" />
-                  </div>
-                </div>
-              </>
-            )}
+              </div>
+            </div>
           </div>
 
           <div className="relative flex h-[200px] w-full flex-col-reverse items-end justify-between">
