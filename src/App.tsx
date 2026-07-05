@@ -5,6 +5,7 @@ import GOOGLE_LOGO from "./assets/google.png";
 import SAMSUNG from "./assets/samsung.png";
 import ARROW from "./assets/arrow.png";
 import Success from "./animation/Success";
+import CicleLoader from "./animation/CicleLoader/CicleLoader";
 
 type MotionState = {
   beta: number;
@@ -56,6 +57,7 @@ const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
 const loaderSticks = Array.from({ length: 12 }, (_, index) => index + 1);
+const SUCCESS_HOLD_MS = 3000;
 
 function App() {
   const [motion, setMotion] = useState<MotionState>({
@@ -68,6 +70,9 @@ function App() {
   });
   const [stepIndex, setStepIndex] = useState(0);
   const [holdMs, setHoldMs] = useState(HOLD_DURATION_MS);
+  const [completionStage, setCompletionStage] = useState<
+    "idle" | "pending" | "success"
+  >("idle");
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -173,6 +178,25 @@ function App() {
   const activeBars = bars.filter(Boolean).length;
   const fillHeight =
     activeBars === 0 ? 0 : activeBars * BAR_HEIGHT + (activeBars - 1) * BAR_GAP;
+  const isFilled = activeBars === BAR_COUNT;
+
+  useEffect(() => {
+    if (completionStage === "success") {
+      return;
+    }
+
+    if (!isFilled) {
+      setCompletionStage("idle");
+      return;
+    }
+
+    setCompletionStage("pending");
+    const timeout = window.setTimeout(() => {
+      setCompletionStage("success");
+    }, SUCCESS_HOLD_MS);
+
+    return () => window.clearTimeout(timeout);
+  }, [completionStage, isFilled]);
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
@@ -217,91 +241,105 @@ function App() {
           />
         </div> */}
 
-        <div className="mt-2 flex-2 grid grid-cols-[1fr_auto_1fr] items-center gap-[10px]">
-          <div className="relative flex h-[200px] w-full flex-col-reverse  justify-between">
-            <span
-              className="absolute bottom-0 -left-[2px]  bg-white"
-              style={{
-                width: `${COLUMN_FILL_WIDTH}px`,
-                height: "7px",
-                bottom: `${fillHeight}px`,
-              }}
-            />
-            {bars.map((active, index) => (
-              <span
-                key={`left-${index}`}
-                className={`relative z-10 block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
-              />
-            ))}
+        {completionStage === "pending" ? (
+          <div className="mt-2 flex h-[214px] flex-1 items-center justify-center">
+            <div className="flex items-center justify-center">
+              <CicleLoader />
+            </div>
           </div>
-
-          <div className="relative flex h-[214px] w-[150px] items-center justify-center">
-            <div className="absolute -right-[120px] -top-[80px] rounded-[24px] z-99 phone-arrow-turn">
-              <div
-                className="relative z-10 flex h-[125px] w-[250px] transition-transform duration-200"
+        ) : completionStage === "success" ? (
+          <div className="mt-2 flex flex-1   items-center justify-center">
+            <div className="flex items-center justify-center">
+              <Success />
+            </div>
+          </div>
+        ) : (
+          <div className="mt-2 flex-2 grid grid-cols-[1fr_auto_1fr] items-center gap-[10px]">
+            <div className="relative flex h-[200px] w-full flex-col-reverse  justify-between">
+              <span
+                className="absolute bottom-0 -left-[2px]  bg-white"
                 style={{
-                  background: `center / 100% 100% no-repeat url(${ARROW})`,
+                  width: `${COLUMN_FILL_WIDTH}px`,
+                  height: "7px",
+                  bottom: `${fillHeight}px`,
                 }}
-              ></div>
+              />
+              {bars.map((active, index) => (
+                <span
+                  key={`left-${index}`}
+                  className={`relative z-10 block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
+                />
+              ))}
             </div>
 
-            <div className="absolute -left-[30px] -top-0 rounded-[24px] phone-stack-left">
+            <div className="relative flex h-[214px] w-[150px] items-center justify-center">
+              <div className="absolute -right-[120px] -top-[80px] rounded-[24px] z-99 phone-arrow-turn">
+                <div
+                  className="relative z-10 flex h-[125px] w-[250px] transition-transform duration-200"
+                  style={{
+                    background: `center / 100% 100% no-repeat url(${ARROW})`,
+                  }}
+                ></div>
+              </div>
+
+              <div className="absolute -left-[30px] -top-0 rounded-[24px] phone-stack-left">
+                <div
+                  className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
+                  style={{
+                    background: `center / 100% 100% no-repeat url(${PHONE})`,
+                  }}
+                ></div>
+              </div>
+
+              <div className="absolute -right-[30px] -top-0 rounded-[24px] phone-stack-right">
+                <div
+                  className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
+                  style={{
+                    background: `center / 100% 100% no-repeat url(${PHONE})`,
+                  }}
+                ></div>
+              </div>
+
               <div
-                className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
+                className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl transition-transform duration-200 phone-main-turn"
                 style={{
                   background: `center / 100% 100% no-repeat url(${PHONE})`,
                 }}
-              ></div>
-            </div>
-
-            <div className="absolute -right-[30px] -top-0 rounded-[24px] phone-stack-right">
-              <div
-                className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
-                style={{
-                  background: `center / 100% 100% no-repeat url(${PHONE})`,
-                }}
-              ></div>
-            </div>
-
-            <div
-              className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl transition-transform duration-200 phone-main-turn"
-              style={{
-                background: `center / 100% 100% no-repeat url(${PHONE})`,
-              }}
-            >
-              <div className="phone-main-logos flex h-full w-full flex-col items-center">
-                <div className="flex-1 flex h-15 w-15 justify-center items-center">
-                  <img src={GOOGLE_LOGO} alt="Google Logo" />
+              >
+                <div className="phone-main-logos flex h-full w-full flex-col items-center">
+                  <div className="flex-1 flex h-15 w-15 justify-center items-center">
+                    <img src={GOOGLE_LOGO} alt="Google Logo" />
+                  </div>
+                  <div className="flex h-15 w-15 justify-center items-center">
+                    <img src={SAMSUNG} alt="Samsung Logo" />
+                  </div>
                 </div>
-                <div className="flex h-15 w-15 justify-center items-center">
-                  <img src={SAMSUNG} alt="Samsung Logo" />
-                </div>
-              </div>
-              <div className="phone-main-success absolute inset-0 flex items-center justify-center px-[10px] py-[18px]">
-                <div className="flex h-full w-full items-center justify-center">
-                  <Success />
+                <div className="phone-main-success absolute inset-0 flex items-center justify-center px-[10px] py-[18px]">
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Success />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="relative flex h-[200px] w-full flex-col-reverse items-end justify-between">
-            <span
-              className="absolute bottom-0 -right-[2px]  bg-white"
-              style={{
-                width: `${COLUMN_FILL_WIDTH}px`,
-                height: "7px",
-                bottom: `${fillHeight}px`,
-              }}
-            />
-            {[...bars].map((active, index) => (
+            <div className="relative flex h-[200px] w-full flex-col-reverse items-end justify-between">
               <span
-                key={`right-${index}`}
-                className={`relative z-10 block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
+                className="absolute bottom-0 -right-[2px]  bg-white"
+                style={{
+                  width: `${COLUMN_FILL_WIDTH}px`,
+                  height: "7px",
+                  bottom: `${fillHeight}px`,
+                }}
               />
-            ))}
+              {[...bars].map((active, index) => (
+                <span
+                  key={`right-${index}`}
+                  className={`relative z-10 block h-[7px] w-[16px] ${active ? "bg-[#22c55e] shadow-[0_0_10px_rgba(34,197,94,0.35)]" : "bg-white/24"}`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <div className="mt-[18px] flex flex-col items-center flex-1">
           <p className="mx-auto mt-2 max-w-[70%] text-center flex items-center text-md  uppercase leading-[1.28] tracking-[-0.01em] text-white/95">
             {step.body}
