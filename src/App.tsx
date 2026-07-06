@@ -19,37 +19,24 @@ type MotionState = {
 type CalibrationStep = {
   title: string;
   subtitle: string;
-  direction: "left" | "right";
-  targetGamma: number;
   body: string;
 };
 
 const HOLD_DURATION_MS = 2400;
-const VERTICAL_BETA = 78;
-const UPSIDE_DOWN_BETA = -78;
-// const UPSIDE_DOWN_TOLERANCE = 22;
+const LANDSCAPE_GAMMA = 80;
+const LANDSCAPE_BETA_TOLERANCE = 30;
 const BAR_WIDTH = 16;
 const BAR_HEIGHT = 7;
 const BAR_COUNT = 20;
 const COLUMN_HEIGHT = 200;
 const COLUMN_FILL_WIDTH = BAR_WIDTH + 4;
 const BAR_GAP = (COLUMN_HEIGHT - BAR_COUNT * BAR_HEIGHT) / (BAR_COUNT - 1);
-// const SUCCESS_PROGRESS = 0.96;
 
 const steps: CalibrationStep[] = [
   {
-    title: "1. ADIM: TELEFONU DIK TUTUP SAGA EG",
+    title: "1. ADIM: TELEFONU DIK TUTUP YATAY CEVIR",
     subtitle: "ADIM 1 / 8",
-    direction: "right",
-    targetGamma: 28,
-    body: "TELEFONU DIK TUTUN VE YALNIZCA SAGA DOGRU EGEREK KALIBRASYONU BASLATIN.",
-  },
-  {
-    title: "2. ADIM: TELEFONU DIK TUTUP SOLA EG",
-    subtitle: "ADIM 2 / 2",
-    direction: "left",
-    targetGamma: -28,
-    body: "CIHAZI DIK POZISYONDA TUTUN VE YALNIZCA SOLA DOGRU EGEREK ISLEMI TAMAMLAYIN.",
+    body: "TELEFONU DIK TUTUN VE CIHAZI SAGA VEYA SOLA DOGRU CEVIREREK YATAY POZISYONA GETIRIN.",
   },
 ];
 
@@ -125,7 +112,7 @@ function App() {
         return {
           ...current,
           beta: clamp(relativeY * -90, -90, 90),
-          gamma: clamp(relativeX * 46, -46, 46),
+          gamma: clamp(relativeX * 90, -90, 90),
           alpha: 0,
           usingPointer: true,
         };
@@ -137,15 +124,15 @@ function App() {
   }, []);
 
   const step = steps[stepIndex];
-  const flipProgress = clamp(
-    (VERTICAL_BETA - motion.beta) / (VERTICAL_BETA - UPSIDE_DOWN_BETA),
+  const horizontalTurn = Math.abs(motion.gamma);
+  const verticalOffset = Math.abs(motion.beta);
+  const gammaProgress = clamp(horizontalTurn / LANDSCAPE_GAMMA, 0, 1);
+  const betaProgress = clamp(
+    1 - verticalOffset / LANDSCAPE_BETA_TOLERANCE,
     0,
     1,
   );
-  // const upsideDownOffset = Math.abs(motion.beta - UPSIDE_DOWN_BETA);
-  // const upsideDownReady = upsideDownOffset < UPSIDE_DOWN_TOLERANCE;
-  const alignment = flipProgress;
-  // const isAligned = upsideDownReady || flipProgress >= SUCCESS_PROGRESS;
+  const alignment = Math.min(gammaProgress, betaProgress);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -172,7 +159,9 @@ function App() {
   const activeBars = bars.filter(Boolean).length;
   const fillHeight =
     activeBars === 0 ? 0 : activeBars * BAR_HEIGHT + (activeBars - 1) * BAR_GAP;
-  const isFilled = activeBars === BAR_COUNT;
+  const isFilled =
+    horizontalTurn >= LANDSCAPE_GAMMA &&
+    verticalOffset <= LANDSCAPE_BETA_TOLERANCE;
 
   useEffect(() => {
     if (completionStage === "success") {

@@ -1,9 +1,9 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'com.example.app',
-  appName: 'accel',
-  webDir: 'dist'
+  appId: "com.example.app",
+  appName: "Accel",
+  webDir: "dist",
 };
 
 export default config;
