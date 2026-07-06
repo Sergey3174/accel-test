@@ -1,22 +1,30 @@
-import { createElement } from "react";
+import { createElement, type CSSProperties } from "react";
 import circleAnimation from "./CicleLoader.json";
 import "@lottiefiles/lottie-player";
 
-export default function CicleLoader() {
+type CicleLoaderProps = {
+  width?: CSSProperties["width"];
+  height?: CSSProperties["height"];
+};
+
+export default function CicleLoader({
+  width = "100%",
+  height = "clamp(100px, 28vh, 600px)",
+}: CicleLoaderProps) {
   const player = createElement("lottie-player" as never, {
     src: circleAnimation,
     background: "transparent",
     speed: "1",
     style: { width: "100%", height: "100%" },
-    loop: false,
+    loop: true,
     autoplay: true,
   });
 
   return (
     <div
       style={{
-        width: "100%",
-        height: "clamp(120px, 28vh, 600px)",
+        width,
+        height,
       }}
     >
       {player}

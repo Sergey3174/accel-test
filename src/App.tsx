@@ -39,7 +39,7 @@ const SUCCESS_PROGRESS = 0.96;
 const steps: CalibrationStep[] = [
   {
     title: "1. ADIM: TELEFONU DIK TUTUP SAGA EG",
-    subtitle: "ADIM 1 / 2",
+    subtitle: "ADIM 1 / 8",
     direction: "right",
     targetGamma: 28,
     body: "TELEFONU DIK TUTUN VE YALNIZCA SAGA DOGRU EGEREK KALIBRASYONU BASLATIN.",
@@ -148,15 +148,9 @@ function App() {
   const isAligned = upsideDownReady || flipProgress >= SUCCESS_PROGRESS;
 
   useEffect(() => {
-    if (!isAligned) {
-      setHoldMs(HOLD_DURATION_MS);
-      return;
-    }
-
     const interval = window.setInterval(() => {
       setHoldMs((current) => {
         if (current <= 100) {
-          setStepIndex((prev) => (prev + 1) % steps.length);
           return HOLD_DURATION_MS;
         }
 
@@ -165,7 +159,7 @@ function App() {
     }, 100);
 
     return () => window.clearInterval(interval);
-  }, [isAligned]);
+  }, []);
 
   const seconds = Math.ceil(holdMs / 1000)
     .toString()
@@ -199,8 +193,8 @@ function App() {
   }, [completionStage, isFilled]);
 
   return (
-    <main className="relative min-h-screen w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
-      <section className="relative z-10 flex min-h-screen w-full flex-col px-[10px] pb-[max(18px,env(safe-area-inset-bottom))] pt-[max(18px,env(safe-area-inset-top))] sm:px-4">
+    <main className="relative min-h-[100dvh] w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
+      <section className="relative z-10 flex min-h-[100dvh] w-full flex-col px-[10px] pb-[max(18px,env(safe-area-inset-bottom))] pt-[max(18px,env(safe-area-inset-top))] sm:px-4">
         <header className="text-center">
           <div className="text-[14px]  font-medium uppercase leading-[1.25] tracking-[-0.02em]">
             {step.title}
@@ -248,9 +242,23 @@ function App() {
             </div>
           </div>
         ) : completionStage === "success" ? (
-          <div className="mt-2 flex flex-1   items-center justify-center">
-            <div className="flex items-center justify-center">
+          <div className="mt-2 mb-8 flex flex-col flex-1   items-center justify-center">
+            <div className="flex flex-1 flex-col items-center justify-center">
               <Success />
+              <div className="text-center text-2xl">
+                {" "}
+                <p>Başarılı! </p> <p>Sensörler Hazır</p>
+              </div>
+            </div>
+
+            <div className="flex gap-10 flex-col items-center justify-center">
+              <CicleLoader width={150} height={150} />
+              <button
+                className="rounded-full w-50 text-xl h-14 bg-green-600"
+                onClick={() => setCompletionStage("idle")}
+              >
+                Başarla
+              </button>
             </div>
           </div>
         ) : (
@@ -272,7 +280,7 @@ function App() {
               ))}
             </div>
 
-            <div className="relative flex h-[214px] w-[150px] items-center justify-center">
+            <div className="relative flex h-[250px] w-[150px] items-center justify-center">
               <div className="absolute -right-[120px] -top-[80px] rounded-[24px] z-99 phone-arrow-turn">
                 <div
                   className="relative z-10 flex h-[125px] w-[250px] transition-transform duration-200"
@@ -284,7 +292,7 @@ function App() {
 
               <div className="absolute -left-[30px] -top-0 rounded-[24px] phone-stack-left">
                 <div
-                  className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
+                  className="relative z-10 flex h-[240px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
                   style={{
                     background: `center / 100% 100% no-repeat url(${PHONE})`,
                   }}
@@ -293,7 +301,7 @@ function App() {
 
               <div className="absolute -right-[30px] -top-0 rounded-[24px] phone-stack-right">
                 <div
-                  className="relative z-10 flex h-[220px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
+                  className="relative z-10 flex h-[240px] w-[120px] flex-col items-center rounded-2xl opacity-50 transition-transform duration-200"
                   style={{
                     background: `center / 100% 100% no-repeat url(${PHONE})`,
                   }}
@@ -301,7 +309,7 @@ function App() {
               </div>
 
               <div
-                className="relative z-10 flex h-[260px] w-[135px] flex-col items-center rounded-2xl transition-transform duration-200 phone-main-turn"
+                className="relative z-20 flex h-[270px] w-[160px] flex-col items-center rounded-2xl transition-transform duration-200 phone-main-turn"
                 style={{
                   background: `center / 100% 100% no-repeat url(${PHONE})`,
                 }}
@@ -340,27 +348,29 @@ function App() {
             </div>
           </div>
         )}
-        <div className="mt-[18px] flex flex-col items-center flex-1">
-          <p className="mx-auto mt-2 max-w-[70%] text-center flex items-center text-md  uppercase leading-[1.28] tracking-[-0.01em] text-white/95">
-            {step.body}
-          </p>
+        {completionStage === "idle" && (
+          <div className="my-[18px] flex flex-col items-center">
+            <p className="mx-auto mt-2 max-w-[70%] text-center flex items-center text-md  uppercase leading-[1.28] tracking-[-0.01em] text-white/95">
+              {step.body}
+            </p>
 
-          <div className="mt-[18px] flex items-center justify-center gap-3">
-            <div className="loader relative">
-              {loaderSticks.map((stick) => (
-                <div
-                  key={stick}
-                  className="loader__stick"
-                  style={{ ["--i" as string]: stick }}
-                />
-              ))}
-              <div className="absolute -left-20 top-1/2 -translate-y-1/2 text-[48px] leading-none font-bold tracking-[-0.08em]">
-                {seconds}
-                <span className="text-[28px]">s</span>
+            <div className="mt-[18px] flex items-center justify-center gap-3">
+              <div className="loader relative">
+                {loaderSticks.map((stick) => (
+                  <div
+                    key={stick}
+                    className="loader__stick"
+                    style={{ ["--i" as string]: stick }}
+                  />
+                ))}
+                <div className="absolute -left-24 top-1/2 -translate-y-1/2 text-[40px] leading-none font-bold ">
+                  {seconds}
+                  <span className="text-[28px]">s</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <hr className="border-white/24" />
 
