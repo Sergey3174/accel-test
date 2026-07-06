@@ -193,8 +193,8 @@ function App() {
   }, [completionStage, isFilled]);
 
   return (
-    <main className="relative min-h-[100dvh] w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
-      <section className="relative z-10 flex min-h-[100dvh] w-full flex-col px-[10px] pb-[max(18px,env(safe-area-inset-bottom))] pt-[max(18px,env(safe-area-inset-top))] sm:px-4">
+    <main className="relative h-[100dvh] w-full overflow-hidden bg-[linear-gradient(180deg,#8d949c_0%,#656d76_38%,#4b525b_68%,#5b636c_100%)] text-white">
+      <section className="relative z-10 flex h-[100dvh] w-full flex-col px-[10px] pb-[max(18px,env(safe-area-inset-bottom))] pt-[max(18px,env(safe-area-inset-top))] sm:px-4">
         <header className="text-center">
           <div className="text-[14px]  font-medium uppercase leading-[1.25] tracking-[-0.02em]">
             {step.title}
