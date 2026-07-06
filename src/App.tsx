@@ -27,14 +27,14 @@ type CalibrationStep = {
 const HOLD_DURATION_MS = 2400;
 const VERTICAL_BETA = 78;
 const UPSIDE_DOWN_BETA = -78;
-const UPSIDE_DOWN_TOLERANCE = 22;
+// const UPSIDE_DOWN_TOLERANCE = 22;
 const BAR_WIDTH = 16;
 const BAR_HEIGHT = 7;
 const BAR_COUNT = 20;
 const COLUMN_HEIGHT = 200;
 const COLUMN_FILL_WIDTH = BAR_WIDTH + 4;
 const BAR_GAP = (COLUMN_HEIGHT - BAR_COUNT * BAR_HEIGHT) / (BAR_COUNT - 1);
-const SUCCESS_PROGRESS = 0.96;
+// const SUCCESS_PROGRESS = 0.96;
 
 const steps: CalibrationStep[] = [
   {
@@ -68,7 +68,7 @@ function App() {
     permission: "unknown",
     usingPointer: false,
   });
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex] = useState(0);
   const [holdMs, setHoldMs] = useState(HOLD_DURATION_MS);
   const [completionStage, setCompletionStage] = useState<
     "idle" | "pending" | "success"
@@ -142,10 +142,10 @@ function App() {
     0,
     1,
   );
-  const upsideDownOffset = Math.abs(motion.beta - UPSIDE_DOWN_BETA);
-  const upsideDownReady = upsideDownOffset < UPSIDE_DOWN_TOLERANCE;
+  // const upsideDownOffset = Math.abs(motion.beta - UPSIDE_DOWN_BETA);
+  // const upsideDownReady = upsideDownOffset < UPSIDE_DOWN_TOLERANCE;
   const alignment = flipProgress;
-  const isAligned = upsideDownReady || flipProgress >= SUCCESS_PROGRESS;
+  // const isAligned = upsideDownReady || flipProgress >= SUCCESS_PROGRESS;
 
   useEffect(() => {
     const interval = window.setInterval(() => {
